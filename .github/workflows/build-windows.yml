@@ -8,29 +8,29 @@ on:
   workflow_dispatch:
 
 jobs:
-- name: Install Qt
-  uses: jurplel/install-qt-action@v3
-  with:
-    version: 6.5.0 # 按需替换
-
-- name: Restore NuGet Packages
-  run: dotnet restore HalalCloud.Client.sln
-
-- name: Update submodules (如有需要)
-  run: git submodule update --init --recursive
   build:
     runs-on: windows-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.5.3'  # 请根据项目需要调整版本
+          arch: win64_msvc2019_64
+
+      - name: Restore NuGet packages
+        run: nuget restore HalalCloud.Client.sln
 
       - name: Set up MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Build with MSBuild
-        run: |
-          msbuild HalalCloud.Client.sln /p:Configuration=Release
+        run: msbuild HalalCloud.Client.sln /p:Configuration=Release
 
       - name: Archive Build Artifacts
         uses: actions/upload-artifact@v4
@@ -38,3 +38,4 @@ jobs:
           name: HalalCloud-Binaries
           path: |
             **\bin\Release\**\*.exe
+            Output\Binaries\Release\**\*.exe
