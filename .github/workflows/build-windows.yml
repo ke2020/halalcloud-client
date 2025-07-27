@@ -8,6 +8,16 @@ on:
   workflow_dispatch:
 
 jobs:
+- name: Install Qt
+  uses: jurplel/install-qt-action@v3
+  with:
+    version: 6.5.0 # 按需替换
+
+- name: Restore NuGet Packages
+  run: dotnet restore HalalCloud.Client.sln
+
+- name: Update submodules (如有需要)
+  run: git submodule update --init --recursive
   build:
     runs-on: windows-latest
 
